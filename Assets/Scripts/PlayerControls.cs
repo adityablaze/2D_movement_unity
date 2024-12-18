@@ -59,7 +59,10 @@ public class PlayerControls : MonoBehaviour
     void OnCollisionEnter2D(Collision2D other){
         Debug.Log(Convert.ToString(groundLayerMask,2).PadLeft(32,'0'));  // layers are stored in bitmask this prints how ground layer is represented in the bits
         if ((groundLayerMask.value & (1 << other.gameObject.layer)) != 0){
-            grounded = true;
+            Vector3 normalvect = other.GetContact(0).normal;
+            if(normalvect == Vector3.up){
+                grounded = true;
+            }
         }
     }
     void OnCollisionExit2D(Collision2D other){
@@ -109,6 +112,7 @@ public class PlayerControls : MonoBehaviour
         amount *= Mathf.Sign(rb.velocity.x);
         rb.AddForce(Vector2.right * -amount, ForceMode2D.Impulse);
     }
+
     void flipHandle(){
         if(input.horizontal > 0 && !facingRight){
             flip();
