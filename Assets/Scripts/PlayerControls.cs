@@ -27,6 +27,7 @@ public class PlayerControls : MonoBehaviour
     [SerializeField] float coyoteTime;
     [SerializeField] float jumpBufferTime;
     public float coyoteTimer; public float jumpBufferTimer;
+    public float jumpCutMultiplier = 0.5f;
 
     Rigidbody2D rb;
     inputManager input;
@@ -44,17 +45,8 @@ public class PlayerControls : MonoBehaviour
         }else{
             coyoteTimer -= Time.deltaTime;
         }
-        if(Input.GetKeyDown(KeyCode.Space)){
-            jumpBufferTimer = jumpBufferTime;
-        }else{
-            jumpBufferTimer -= Time.deltaTime;
-        }
-        if(coyoteTimer > 0 && Input.GetKeyDown(KeyCode.Space) && rb.velocity.y < 0){
-            jump();
-        }
-        if(jumpBufferTimer>0 && !isInAir){
-            jump();
-        }
+        jumpHandler();
+        
         Aircheck();
     }
 
@@ -79,9 +71,27 @@ public class PlayerControls : MonoBehaviour
         }
     }
     
-
+    void jumpHandler(){
+        if(Input.GetKeyDown(KeyCode.Space)){
+            jumpBufferTimer = jumpBufferTime;
+        }else{
+            jumpBufferTimer -= Time.deltaTime;
+        }
+        if(coyoteTimer > 0 && Input.GetKeyDown(KeyCode.Space) && rb.velocity.y < 0){
+            jump();
+        }
+        if(jumpBufferTimer>0 && !isInAir){
+            jump();
+        }
+        jumpCut();
+    }
     void jump(){
         rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+    }
+    void jumpCut(){
+        if(Input.GetKeyUp(KeyCode.Space) && rb.velocity.y > 0 && isInAir){
+            rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * (1-jumpCutMultiplier));
+        }
     }
     void Aircheck(){
         if(rb.velocity.y != 0 && !grounded){
