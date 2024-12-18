@@ -2,10 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices.WindowsRuntime;
-using Unity.VisualScripting;
 using UnityEditor.Callbacks;
 using UnityEngine;
-using UnityEngine.U2D.IK;
 using UnityEngine.UIElements;
 
 public class PlayerControls : MonoBehaviour
@@ -90,7 +88,8 @@ public class PlayerControls : MonoBehaviour
     }
     void jumpCut(){
         if(Input.GetKeyUp(KeyCode.Space) && rb.velocity.y > 0 && isInAir){
-            rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * (1-jumpCutMultiplier));
+            //rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * (1-jumpCutMultiplier));
+            rb.AddForce(Vector2.down * rb.velocity.y * (1-jumpCutMultiplier), ForceMode2D.Impulse);
         }
     }
     void Aircheck(){
