@@ -5,6 +5,8 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using Unity.VisualScripting;
 using UnityEditor.Callbacks;
 using UnityEngine;
+using UnityEngine.U2D.IK;
+using UnityEngine.UIElements;
 
 public class PlayerControls : MonoBehaviour
 {
@@ -14,12 +16,17 @@ public class PlayerControls : MonoBehaviour
     [SerializeField] float moveSpeed;
     [SerializeField] float velPower;
     [SerializeField] float jumpForce;
+    [SerializeField] bool grounded;
+    [SerializeField] float frictionAmount = 0.2f;
+    [SerializeField] bool facingRight = true;
+    [SerializeField] bool isInAir = true;
     
     [Space(30)]
-    [SerializeField] Vector2 castboxSize;
-    [SerializeField] float castDistance;
-    [SerializeField] LayerMask groundLayer;
-
+    [SerializeField] LayerMask groundLayerMask;
+    [Space(10)]
+    [SerializeField] float coyoteTime;
+    [SerializeField] float jumpBufferTime;
+    public float coyoteTimer; public float jumpBufferTimer;
 
     Rigidbody2D rb;
     inputManager input;
@@ -31,35 +38,79 @@ public class PlayerControls : MonoBehaviour
 
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.Space) && isgrounded()){
+        if(grounded){
+            coyoteTimer = coyoteTime;
+            isInAir = false;
+        }else{
+            coyoteTimer -= Time.deltaTime;
+        }
+        if(Input.GetKeyDown(KeyCode.Space)){
+            jumpBufferTimer = jumpBufferTime;
+        }else{
+            jumpBufferTimer -= Time.deltaTime;
+        }
+        if(coyoteTimer > 0 && Input.GetKeyDown(KeyCode.Space) && rb.velocity.y < 0){
             jump();
         }
+        if(jumpBufferTimer>0 && !isInAir){
+            jump();
+        }
+        Aircheck();
     }
 
     void FixedUpdate(){
         movement();
+        flipHandle();
+        if(grounded && Mathf.Abs(input.horizontal) < 0.01f){
+            friction();
+        }
     }
 
-    bool isgrounded(){
-        if(Physics2D.BoxCast(transform.position,castboxSize,0,Vector2.down,castDistance,groundLayer))
-            return true;
-        else
-            return false;
+    void OnCollisionEnter2D(Collision2D other){
+        Debug.Log(Convert.ToString(groundLayerMask,2).PadLeft(32,'0'));  // layers are stored in bitmask this prints how ground layer is represented in the bits
+        if ((groundLayerMask.value & (1 << other.gameObject.layer)) != 0){
+            grounded = true;
+        }
     }
-    private void OnDrawGizmos(){
-        Gizmos.DrawWireCube(transform.position - transform.up * castDistance, castboxSize);
+    void OnCollisionExit2D(Collision2D other){
+        Debug.Log(Convert.ToString(groundLayerMask,2).PadLeft(32,'0'));  // layers are stored in bitmask this prints how ground layer is represented in the bits
+        if((groundLayerMask.value & (1 << other.gameObject.layer)) != 0){
+            grounded = false;
+        }
     }
+    
+
     void jump(){
         rb.velocity = new Vector2(rb.velocity.x, jumpForce);
     }
-
+    void Aircheck(){
+        if(rb.velocity.y != 0 && !grounded){
+            isInAir = true;
+        }
+    }
     void movement(){
         float targetSpeed = input.horizontal * moveSpeed;
         float speedDiff = targetSpeed - rb.velocity.x;
         float accelRate = (Mathf.Abs(targetSpeed) > 0.01f) ? acceleration:deacceleration;
         float force = Mathf.Pow(Mathf.Abs(speedDiff)*accelRate, velPower) * Mathf.Sign(speedDiff);
-
         rb.AddForce(force * Vector2.right);
     }
-
+    void friction(){
+        float amount = Mathf.Min(Mathf.Abs(rb.velocity.x), Math.Abs(frictionAmount));
+        amount *= Mathf.Sign(rb.velocity.x);
+        rb.AddForce(Vector2.right * -amount, ForceMode2D.Impulse);
+    }
+    void flipHandle(){
+        if(input.horizontal > 0 && !facingRight){
+            flip();
+        }if(input.horizontal < 0 && facingRight){
+            flip();
+        }
+    }
+    void flip(){
+        Vector3 scale = gameObject.transform.localScale;
+        scale.x *= -1;
+        gameObject.transform.localScale = scale;
+        facingRight = !facingRight;
+    }
 }
