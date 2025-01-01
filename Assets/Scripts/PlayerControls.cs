@@ -78,7 +78,7 @@ public class PlayerControls : MonoBehaviour
         }else{
             jumpBufferTimer -= Time.deltaTime;
         }
-        if(coyoteTimer > 0 && Input.GetKeyDown(KeyCode.Space) && rb.velocity.y < 0){
+        if(coyoteTimer > 0 && Input.GetKeyDown(KeyCode.Space) && isInAir){
             jump();
         }
         if(jumpBufferTimer>0 && !isInAir){
