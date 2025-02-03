@@ -44,7 +44,6 @@ public class PlayerControls : MonoBehaviour
             coyoteTimer -= Time.deltaTime;
         }
         jumpHandler();
-        
         Aircheck();
     }
 
@@ -66,7 +65,7 @@ public class PlayerControls : MonoBehaviour
         }
     }
     void OnCollisionExit2D(Collision2D other){
-        Debug.Log(Convert.ToString(groundLayerMask,2).PadLeft(32,'0'));  // layers are stored in bitmask this prints how ground layer is represented in the bits
+        //Debug.Log(Convert.ToString(groundLayerMask,2).PadLeft(32,'0'));  // layers are stored in bitmask this prints how ground layer is represented in the bits
         if((groundLayerMask.value & (1 << other.gameObject.layer)) != 0){
             grounded = false;
         }
