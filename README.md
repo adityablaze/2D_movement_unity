@@ -19,3 +19,5 @@ Jumping is the core of any platformer, and this controller includes multiple sys
 - **Variable Jump Height:** The longer you hold the jump button, the higher the character jumps. This gives players precise control to handle any platforming challenge.
 - **Coyote Time:** To improve platforming forgiveness, you can jump for a brief moment _after_ running off a ledge. This small window of opportunity prevents frustrating "I swear I pressed jump!" moments.
 - **Jump Buffering:** If you press the jump button slightly _before_ landing, the input is remembered. The character will automatically jump the moment they touch the ground, ensuring no input is ever missed.
+
+https://github.com/user-attachments/assets/8b50a55d-339f-4153-8b62-3940c6dfdb2e
