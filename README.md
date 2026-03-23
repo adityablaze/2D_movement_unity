@@ -2,6 +2,8 @@
 
 This project features a responsive and robust 2D character controller built in Unity, focusing on tight, physics-based controls and a satisfying game feel. It's packed with features found in modern platformers to give players a fluid and intuitive experience.
 
+https://github.com/user-attachments/assets/8b50a55d-339f-4153-8b62-3940c6dfdb2e
+
 ## Features
 
 ### 🎮 Physics-Based Movement
